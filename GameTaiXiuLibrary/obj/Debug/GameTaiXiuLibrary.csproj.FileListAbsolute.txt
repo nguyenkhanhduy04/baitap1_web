@@ -1,0 +1,6 @@
+D:\BT_WEB\GameTaiXiuLibrary\GameTaiXiuLibrary\bin\Debug\GameTaiXiuLibrary.dll
+D:\BT_WEB\GameTaiXiuLibrary\GameTaiXiuLibrary\bin\Debug\GameTaiXiuLibrary.pdb
+D:\BT_WEB\GameTaiXiuLibrary\GameTaiXiuLibrary\obj\Debug\GameTaiXiuLibrary.csproj.AssemblyReference.cache
+D:\BT_WEB\GameTaiXiuLibrary\GameTaiXiuLibrary\obj\Debug\GameTaiXiuLibrary.csproj.CoreCompileInputs.cache
+D:\BT_WEB\GameTaiXiuLibrary\GameTaiXiuLibrary\obj\Debug\GameTaiXiuLibrary.dll
+D:\BT_WEB\GameTaiXiuLibrary\GameTaiXiuLibrary\obj\Debug\GameTaiXiuLibrary.pdb

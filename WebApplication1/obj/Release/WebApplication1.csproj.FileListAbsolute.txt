@@ -1,0 +1,10 @@
+D:\DUY\GameTaiXiuLibrary\WebApplication1\bin\WebApplication1.dll.config
+D:\DUY\GameTaiXiuLibrary\WebApplication1\bin\WebApplication1.dll
+D:\DUY\GameTaiXiuLibrary\WebApplication1\bin\WebApplication1.pdb
+D:\DUY\GameTaiXiuLibrary\WebApplication1\bin\GameTaiXiuLibrary.dll
+D:\DUY\GameTaiXiuLibrary\WebApplication1\bin\GameTaiXiuLibrary.pdb
+D:\DUY\GameTaiXiuLibrary\WebApplication1\obj\Release\WebApplication1.csproj.AssemblyReference.cache
+D:\DUY\GameTaiXiuLibrary\WebApplication1\obj\Release\WebApplication1.csproj.CoreCompileInputs.cache
+D:\DUY\GameTaiXiuLibrary\WebApplication1\obj\Release\WebAppli.7D14BD69.Up2Date
+D:\DUY\GameTaiXiuLibrary\WebApplication1\obj\Release\WebApplication1.dll
+D:\DUY\GameTaiXiuLibrary\WebApplication1\obj\Release\WebApplication1.pdb

@@ -1,0 +1,415 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Game Tài Xỉu — Gọn gàng</title>
+    <style>
+        :root {
+            --bg: #071428;
+            --card: #0f1724;
+            --accent: #ffd166;
+            --muted: #9fb0c2;
+            --good: #6ee7b7;
+            --danger: #ff6b6b;
+            font-family: system-ui,Segoe UI,Roboto,Arial;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg,var(--bg),#041028);
+            color: #e6eef6;
+            padding: 20px;
+        }
+
+        .card {
+            width: 720px;
+            max-width: 96%;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+            display: grid;
+            grid-template-columns: 1fr 260px;
+            gap: 16px;
+            align-items: start;
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--accent);
+            font-size: 20px
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 12px
+        }
+
+        /* left: gameplay */
+        .left {
+            padding-right: 6px
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap
+        }
+
+        .balance {
+            font-weight: 800;
+            font-size: 20px;
+            margin-right: 12px
+        }
+
+        input[type="number"] {
+            width: 120px;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255,255,255,0.02);
+            color: inherit
+        }
+
+        .btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(180deg,var(--accent),#ffb84d);
+            color: #042018;
+            font-weight: 700
+        }
+
+        .smallbtn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.04);
+            color: var(--muted);
+            padding: 8px 10px;
+            border-radius: 8px
+        }
+
+        /* dice + cup */
+        .play-area {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            justify-content: center
+        }
+
+        .dice {
+            display: flex;
+            gap: 10px
+        }
+
+        .die {
+            width: 72px;
+            height: 72px;
+            border-radius: 10px;
+            background: #fff;
+            color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5)
+        }
+
+            .die.dark {
+                background: linear-gradient(180deg,#12202a,#0b1620);
+                color: var(--muted)
+            }
+
+        .cup-wrap {
+            position: relative;
+            width: 220px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .cup {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            width: 180px;
+            height: 90px;
+            border-radius: 90px 90px 24px 24px/60px;
+            background: linear-gradient(180deg,#1c2430,#0f1724);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-weight: 700;
+            transition: transform .6s,opacity .4s
+        }
+
+            .cup.hidden {
+                transform: translateX(-50%) translateY(-160%);
+                opacity: 0;
+                pointer-events: none
+            }
+
+        .countdown {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        /* right: compact stats */
+        .side {
+            padding-left: 6px
+        }
+
+        .stat {
+            background: rgba(255,255,255,0.02);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 14px
+        }
+
+        .history {
+            max-height: 300px;
+            overflow: auto;
+            padding: 8px;
+            background: transparent;
+            border-radius: 6px;
+            border: 1px dashed rgba(255,255,255,0.02);
+            font-size: 13px
+        }
+
+        .hist-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 4px
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        @media (max-width:820px) {
+            .card {
+                grid-template-columns: 1fr;
+                padding: 14px
+            }
+
+            .cup-wrap {
+                display: none
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card" role="main">
+        <div class="left">
+            <h1>Game Tài Xỉu</h1>
+            <div class="meta">Gọn — trực quan — bát úp 5s trước khi lật</div>
+
+            <div class="controls" aria-hidden="false">
+                <div class="balance">Số dư: <span id="balance">1000</span></div>
+                <div>
+                    <input id="betInput" type="number" min="1" step="1" value="50" aria-label="Cược" />
+                </div>
+                <div>
+                    <button id="btnTai" class="btn" title="Chọn Tài">TÀI</button>
+                </div>
+                <div>
+                    <button id="btnXiu" class="btn" title="Chọn Xỉu">XỈU</button>
+                </div>
+                <div>
+                    <button id="playBtn" class="btn" title="Đặt cược & Quay">Đặt cược</button>
+                </div>
+                <div>
+                    <button id="resetBtn" class="smallbtn">Reset</button>
+                </div>
+            </div>
+
+            <div class="play-area" aria-live="polite">
+                <div class="dice" id="dice">
+                    <div class="die dark" id="d1">—</div>
+                    <div class="die dark" id="d2">—</div>
+                    <div class="die dark" id="d3">—</div>
+                </div>
+
+                <div class="cup-wrap" aria-hidden="true">
+                    <div class="countdown" id="countdown" style="display:none">5</div>
+                    <div class="cup" id="cup">BẮT</div>
+                </div>
+            </div>
+
+            <div id="roundResult" class="muted" style="margin-top:12px">Chọn cửa và nhập cược, nhấn Đặt cược.</div>
+        </div>
+
+        <div class="side">
+            <div class="stat">
+                <div class="muted">Tổng thắng / thua</div>
+                <div style="font-weight:800"><span id="statWon">0</span> / <span id="statLost">0</span></div>
+            </div>
+
+            <div class="stat" style="margin-bottom:6px">
+                <div class="muted">Lịch sử (mới nhất trên cùng)</div>
+            </div>
+            <div class="history" id="history" role="log" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            // state
+            let balance = Number(localStorage.getItem('sx_balance') || 1000);
+            let history = JSON.parse(localStorage.getItem('sx_history') || '[]');
+            let stats = { won: 0, lost: 0 };
+            let selected = null;
+            let busy = false;
+
+            const el = id => document.getElementById(id);
+            const dEls = [el('d1'), el('d2'), el('d3')];
+
+            const btnTai = el('btnTai'), btnXiu = el('btnXiu'), playBtn = el('playBtn'), resetBtn = el('resetBtn');
+            const betInput = el('betInput'), balanceEl = el('balance');
+            const statWon = el('statWon'), statLost = el('statLost'), historyEl = el('history');
+            const cup = el('cup'), countdown = el('countdown'), roundResult = el('roundResult');
+
+            function renderBalance() { balanceEl.textContent = balance; }
+            function renderStats() { statWon.textContent = stats.won; statLost.textContent = stats.lost; }
+            function renderHistory() { historyEl.innerHTML = ''; history.slice().reverse().forEach(h => { const d = document.createElement('div'); d.className = 'hist-item'; d.innerHTML = `<div>${h.choice.toUpperCase()} • ${h.bet}</div><div class="muted">${h.out} • ${h.time}</div>`; historyEl.appendChild(d); }); }
+            function save() { localStorage.setItem('sx_balance', String(balance)); localStorage.setItem('sx_history', JSON.stringify(history.slice(-200))); }
+
+            // choice
+            function setChoice(c) {
+                selected = c;
+                btnTai.style.opacity = btnXiu.style.opacity = '1';
+                if (c === 'tai') { btnTai.style.boxShadow = '0 6px 18px rgba(255,209,102,0.12)'; btnXiu.style.boxShadow = 'none'; }
+                else { btnXiu.style.boxShadow = '0 6px 18px rgba(77,208,225,0.08)'; btnTai.style.boxShadow = 'none'; }
+            }
+            btnTai.addEventListener('click', () => setChoice('tai'));
+            btnXiu.addEventListener('click', () => setChoice('xiu'));
+
+            // reset
+            resetBtn.addEventListener('click', () => {
+                if (!confirm('Reset số dư về 1000 và xóa lịch sử?')) return;
+                balance = 1000; history = []; stats = { won: 0, lost: 0 }; save(); renderBalance(); renderHistory(); renderStats();
+                roundResult.textContent = 'Đã reset.';
+            });
+
+            // dice utils
+            function randDie() { return 1 + Math.floor(Math.random() * 6); }
+            function animateDice(finalVals, frames = 10, interval = 80) {
+                return new Promise(resolve => {
+                    let t = 0;
+                    const iv = setInterval(() => {
+                        t++;
+                        for (let i = 0; i < 3; i++) dEls[i].textContent = 1 + Math.floor(Math.random() * 6);
+                        if (t >= frames) { clearInterval(iv); for (let i = 0; i < 3; i++) dEls[i].textContent = finalVals[i]; resolve(); }
+                    }, interval);
+                });
+            }
+
+            // cup reveal: show cup for 5s then lift
+            function liftCupAfter(delaySec) {
+                cup.classList.remove('hidden');
+                countdown.style.display = 'block';
+                let t = delaySec;
+                countdown.textContent = t;
+                const iv = setInterval(() => { t--; countdown.textContent = t; if (t <= 0) { clearInterval(iv); countdown.style.display = 'none'; cup.classList.add('hidden'); } }, 1000);
+                // return promise that resolves when cup hidden
+                return new Promise(resolve => setTimeout(resolve, delaySec * 1000));
+            }
+
+            // evaluate rules
+            function evaluate(d1, d2, d3) {
+                const sum = d1 + d2 + d3; const isTriple = (d1 === d2 && d2 === d3);
+                if (isTriple) return { out: 'HOUSE', sum };
+                if (sum >= 11 && sum <= 18) return { out: 'TAI', sum };
+                return { out: 'XIU', sum };
+            }
+
+            // main play
+            async function play() {
+                if (busy) return;
+                const bet = Math.floor(Number(betInput.value) || 0);
+                if (!selected) { roundResult.textContent = 'Chưa chọn cửa.'; return; }
+                if (!Number.isFinite(bet) || bet <= 0) { roundResult.textContent = 'Cược không hợp lệ.'; return; }
+                if (bet > balance) { roundResult.textContent = 'Cược vượt quá số dư.'; return; }
+
+                busy = true; playBtn.disabled = true; btnTai.disabled = btnXiu.disabled = true; betInput.disabled = true;
+                roundResult.textContent = 'Đang đặt cược — bát úp 5s...';
+                // generate final dice now (so randomness fixed) and animate while cup on
+                const f1 = randDie(), f2 = randDie(), f3 = randDie();
+                const final = [f1, f2, f3];
+
+                // show cup and animate dice while covered
+                cup.classList.remove('hidden'); countdown.style.display = 'block';
+                // animate dice rapidly while countdown runs
+                const countdownSec = 5;
+                let frames = Math.ceil((countdownSec * 1000) / 80);
+                const animPromise = animateDice(final, frames, 80);
+                // countdown UI
+                let t = countdownSec; countdown.textContent = t;
+                const tv = setInterval(() => { t--; countdown.textContent = t; if (t <= 0) clearInterval(tv); }, 1000);
+
+                // wait for animation + countdown
+                await animPromise;
+                // lift cup (hide)
+                countdown.style.display = 'none'; cup.classList.add('hidden');
+
+                // evaluate and update
+                const res = evaluate(...final);
+                let delta = 0; let outText = '';
+                const time = new Date().toLocaleTimeString();
+                if (res.out === 'HOUSE') {
+                    outText = `Triple ${final.join('-')}: Nhà cái thắng`; delta = -bet; stats.lost += bet;
+                } else {
+                    const win = (res.out.toLowerCase() === selected) ? true : false;
+                    if (win) { outText = `Bạn thắng! ${res.out} (${res.sum})`; delta = bet; stats.won += bet; }
+                    else { outText = `Bạn thua. ${res.out} (${res.sum})`; delta = -bet; stats.lost += bet; }
+                }
+
+                balance += delta;
+                history.push({ choice: selected, bet, out: (delta > 0 ? 'WIN' : 'LOSE'), detail: outText, time });
+                if (history.length > 200) history.shift();
+                save(); renderBalance(); renderHistory(); renderStats();
+
+                roundResult.textContent = outText + (delta !== 0 ? ` • ${delta > 0 ? '+' : '-'}${Math.abs(delta)}` : '');
+                // re-enable
+                busy = false; playBtn.disabled = false; btnTai.disabled = false; btnXiu.disabled = false; betInput.disabled = false;
+            }
+
+            playBtn.addEventListener('click', play);
+
+            // keyboard shortcuts
+            window.addEventListener('keydown', e => {
+                if (e.key === 't' || e.key === 'T') setChoice('tai');
+                if (e.key === 'x' || e.key === 'X') setChoice('xiu');
+                if (e.key === 'Enter') play();
+            });
+
+            // init
+            renderBalance(); renderHistory(); renderStats();
+            cup.classList.add('hidden');
+            window.SX = { getBalance: () => balance, setBalance: v => { balance = v; save(); renderBalance(); } };
+        })();
+    </script>
+</body>
+</html>
